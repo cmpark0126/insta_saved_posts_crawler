@@ -122,20 +122,19 @@ async function scrollAndCaptureHTML(callback) {
             callback(numAllUpdated); // 콜백 함수 호출
             return;
         } else if (numUpdated == 0) {
+            skipByNoNewPosts++;
             console.log(
                 `No new posts found. Retry ${skipByNoNewPosts} / ${maxSkipNoNewPosts}.`
             );
-            skipByNoNewPosts++;
         } else {
             numHasDiff++;
             skipByNoNewPosts = 0;
+            numAllUpdated += numUpdated;
             console.log("New posts found. Reset skip count.");
             console.log(
                 `Total ${numHasDiff} times new posts found. Total ${numAllUpdated} posts has updated.`
             );
         }
-
-        numAllUpdated += numUpdated;
 
         attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
         setTimeout(() => window.scrollTo(0, document.body.scrollHeight), TIME);
