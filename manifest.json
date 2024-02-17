@@ -23,12 +23,8 @@
     },
     "content_scripts": [
         {
-            "matches": [
-                "https://www.instagram.com/*/saved/all-posts/"
-            ],
-            "js": [
-                "contentScript.js"
-            ]
+            "matches": ["https://www.instagram.com/*/saved/all-posts/"],
+            "js": ["contentScript.js"]
         }
     ]
 }
