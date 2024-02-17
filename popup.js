@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("startButton").addEventListener("click", () => {
         const url = document.getElementById("urlInput").value;
+        const user = document.getElementById("userInput").value;
+        const token = document.getElementById("tokenInput").value;
         // Query the current active tab
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             // Send a message to the active tab to start scrolling and capturing HTML
@@ -9,6 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 {
                     action: "scrollAndCapture",
                     url: url,
+                    user: user,
+                    token: token,
                 },
                 (response) => {
                     if (response && response.num) {

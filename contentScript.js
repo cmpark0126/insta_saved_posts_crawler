@@ -1,25 +1,26 @@
 const TIME = 1000; // 1 second
 let backendServerUrl = ""; // e.g., "http://127.0.0.1:8000/items/"
+let user = "";
+let token = "";
 
 async function sendDataToServer(data) {
-    const response = await fetch(backendServerUrl, {
+    const response = await fetch(`${backendServerUrl}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             accept: "application/json", // 수락 가능한 응답 타입 지정
-            // TODO: 인증 헤더 추가
+            Authorization: `${token}`,
         },
         body: JSON.stringify({
             url: data.url,
             content: data.content,
             thumbnail: data.thumbnail,
+            user: user,
         }),
     });
-
     const responseData = await response.json().catch((error) => {
         console.error("Error:", error);
     });
-
     console.log("Response data:", responseData.detail);
     if (responseData.detail === "Item already exists") {
         return Promise.resolve(false); // Item already exists
@@ -29,6 +30,8 @@ async function sendDataToServer(data) {
         console.error("unexpected response:", responseData);
         throw new Error("unexpected response");
     }
+    // console.log("Data to send:", data.url);
+    // return Promise.resolve(true);
 }
 
 async function crawlPostLinks() {
@@ -155,7 +158,11 @@ async function scrollAndCaptureHTML(callback) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "scrollAndCapture") {
         backendServerUrl = request.url;
+        user = request.user;
+        token = request.token;
         console.log("Set backendServerUrl:", backendServerUrl);
+        console.log("Set user:", user);
+        console.log("Set token:", token);
 
         scrollAndCaptureHTML((num) => {
             sendResponse({ num: num });
