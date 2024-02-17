@@ -1,7 +1,8 @@
 const TIME = 1000; // 1 second
+let backendServerUrl = ""; // e.g., "http://127.0.0.1:8000/items/"
 
 async function sendDataToServer(data) {
-    const response = await fetch("http://127.0.0.1:8000/items/", {
+    const response = await fetch(backendServerUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -184,6 +185,9 @@ async function scrollAndCaptureHTML(callback) {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "scrollAndCapture") {
+        backendServerUrl = request.url;
+        console.log("Set backendServerUrl:", backendServerUrl);
+
         scrollAndCaptureHTML((num) => {
             sendResponse({ num: num });
             chrome.runtime.sendMessage(

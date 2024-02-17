@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("startButton").addEventListener("click", () => {
+        const url = document.getElementById("urlInput").value;
         // Query the current active tab
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             // Send a message to the active tab to start scrolling and capturing HTML
@@ -7,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 tabs[0].id,
                 {
                     action: "scrollAndCapture",
+                    url: url,
                 },
                 (response) => {
                     if (response && response.num) {
