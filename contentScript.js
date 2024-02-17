@@ -17,17 +17,18 @@ async function sendDataToServer(data) {
         console.error("Error:", error);
     });
 
+    console.log("Response data:", responseData.detail);
     if (responseData.detail === "Item already exists") {
-        return false; // Item already exists
+        return Promise.resolve(false); // Item already exists
     } else if (responseData.detail === "Item created") {
-        return true; // Item created
+        return Promise.resolve(true); // Item created
     } else {
         console.error("unexpected response:", responseData);
         throw new Error("unexpected response");
     }
 }
 
-function crawlPostLinks() {
+async function crawlPostLinks() {
     let numUpdated = 0;
 
     const postsContainerXPath =
@@ -81,13 +82,13 @@ function crawlPostLinks() {
                     // console.log(postInner.src);
 
                     // if updated, has_updated will be true
-                    if (
-                        sendDataToServer({
-                            url: postLink.href,
-                            content: postInner.alt,
-                            thumbnail: postInner.src,
-                        })
-                    ) {
+                    hasUpdated = await sendDataToServer({
+                        url: postLink.href,
+                        content: postInner.alt,
+                        thumbnail: postInner.src,
+                    });
+
+                    if (hasUpdated) {
                         numUpdated++;
                     }
                 }
@@ -98,7 +99,7 @@ function crawlPostLinks() {
     return numUpdated;
 }
 
-function scrollAndCaptureHTML(callback) {
+async function scrollAndCaptureHTML(callback) {
     let lastScrollHeight = 0;
     let attempts = 0;
     let countOfLoad = 0;
@@ -106,7 +107,7 @@ function scrollAndCaptureHTML(callback) {
     const maxAttempts = 10; // 최대 시도 횟수를 정의하여 무한 스크롤을 방지합니다.
 
     // 변화 감지를 위한 observer 생성
-    const observer = new MutationObserver((mutations, obs) => {
+    const observer = new MutationObserver(async (mutations, obs) => {
         const currentScrollHeight = document.body.scrollHeight;
 
         if (
@@ -131,7 +132,7 @@ function scrollAndCaptureHTML(callback) {
             countOfLoad++;
             console.log("countOfLoad: " + countOfLoad);
 
-            const numUpdated = crawlPostLinks();
+            const numUpdated = await crawlPostLinks();
             console.log(`${numUpdated} posts has updated`);
 
             if (numUpdated == 0) {
@@ -183,6 +184,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     );
                 }
             );
+        }).catch((error) => {
+            console.error("Error:", error);
+            sendResponse({ error: error });
         });
 
         console.log("Scrolling and capturing started.");
