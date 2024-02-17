@@ -24,7 +24,9 @@ function scrollAndCaptureHTML(callback) {
     if (request.action === "scrollAndCapture") {
       scrollAndCaptureHTML((html) => {
         sendResponse({ html: html });
-        chrome.runtime.sendMessage({ action: "asyncJobCompleted", result: "HTML captured."});
+        chrome.runtime.sendMessage({ action: "asyncJobCompleted", result: "HTML captured."}, (response) => {
+            console.log('message received from sendResponse: ' + response.message);
+        });
       });
 
       console.log("Scrolling and capturing started.");

@@ -10,6 +10,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         message: message.result,
         priority: 2
       });
+
+
+      const returnMessage = 'complete creating notification.'
+      sendResponse({
+        message: returnMessage,
+      });
     }
   });
   
