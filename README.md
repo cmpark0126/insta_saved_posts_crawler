@@ -24,7 +24,7 @@
 
 ### pin `Instagram Saved Posts Crawler` extension to top of the chrome
 
-![3_4_pin](3_4_pin.png)
+![3_4_pin](assets/3_4_pin.png)
 
 ## move to https://www.instagram.com/<user_id>/saved/all-posts/
 
