@@ -9,19 +9,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     action: "scrollAndCapture",
                 },
                 (response) => {
-                    if (response && response.html) {
+                    if (response && response.num) {
                         // Display the captured HTML in the popup
-                        document.getElementById("htmlContent").textContent =
-                            response.html;
+                        document.getElementById("numPosts").textContent =
+                            response.num;
                     } else {
                         // Handle any errors
                         if (chrome.runtime.lastError) {
                             document.getElementById(
-                                "htmlContent"
+                                "numPosts"
                             ).textContent = `Error: ${chrome.runtime.lastError.message}`;
                         } else {
-                            document.getElementById("htmlContent").textContent =
-                                "Error getting HTML.";
+                            document.getElementById("numPosts").textContent =
+                                "Error crawling posts.";
                         }
                     }
                 }

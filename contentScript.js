@@ -1,5 +1,5 @@
-function sendDataToServer(data) {
-    fetch("http://127.0.0.1:8000/items/", {
+async function sendDataToServer(data) {
+    const response = await fetch("http://127.0.0.1:8000/items/", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -11,13 +11,25 @@ function sendDataToServer(data) {
             content: data.content,
             thumbnail: data.thumbnail,
         }),
-    })
-        .then((response) => response.json())
-        .then((data) => console.log(data))
-        .catch((error) => console.error("Error:", error));
+    });
+
+    const responseData = await response.json().catch((error) => {
+        console.error("Error:", error);
+    });
+
+    if (responseData.detail === "Item already exists") {
+        return false; // Item already exists
+    } else if (responseData.detail === "Item created") {
+        return true; // Item created
+    } else {
+        console.error("unexpected response:", responseData);
+        throw new Error("unexpected response");
+    }
 }
 
 function crawlPostLinks() {
+    let numUpdated = 0;
+
     const postsContainerXPath =
         "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div[3]/article/div[1]/div";
     const postsContainer = document
@@ -68,21 +80,29 @@ function crawlPostLinks() {
                     // console.log(postInner.alt);
                     // console.log(postInner.src);
 
-                    sendDataToServer({
-                        url: postLink.href,
-                        content: postInner.alt,
-                        thumbnail: postInner.src,
-                    });
+                    // if updated, has_updated will be true
+                    if (
+                        sendDataToServer({
+                            url: postLink.href,
+                            content: postInner.alt,
+                            thumbnail: postInner.src,
+                        })
+                    ) {
+                        numUpdated++;
+                    }
                 }
             }
         }
     }
+
+    return numUpdated;
 }
 
 function scrollAndCaptureHTML(callback) {
     let lastScrollHeight = 0;
     let attempts = 0;
     let countOfLoad = 0;
+    let numAllUpdated = 0;
     const maxAttempts = 10; // 최대 시도 횟수를 정의하여 무한 스크롤을 방지합니다.
 
     // 변화 감지를 위한 observer 생성
@@ -102,13 +122,28 @@ function scrollAndCaptureHTML(callback) {
         } else if (attempts >= maxAttempts) {
             // 최대 시도 횟수에 도달했거나 더 이상 콘텐츠가 로드되지 않을 경우
             console.log("Scrolling finished or max attempts reached.");
+            console.log(
+                `Scrolling finished. ${numAllUpdated} posts has updated.`
+            );
             obs.disconnect(); // Observer를 중지합니다.
-            callback(document.documentElement.outerHTML); // 콜백 함수 호출
+            callback(numAllUpdated); // 콜백 함수 호출
         } else {
             countOfLoad++;
             console.log("countOfLoad: " + countOfLoad);
 
-            crawlPostLinks();
+            const numUpdated = crawlPostLinks();
+            console.log(`${numUpdated} posts has updated`);
+
+            if (numUpdated == 0) {
+                console.log("No new posts found.");
+                console.log(
+                    `Scrolling finished. ${numAllUpdated} posts has updated.`
+                );
+                obs.disconnect(); // Observer를 중지합니다.
+                callback(numAllUpdated); // 콜백 함수 호출
+                return;
+            }
+            numAllUpdated += numUpdated;
 
             lastScrollHeight = currentScrollHeight;
             attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
@@ -134,10 +169,13 @@ function scrollAndCaptureHTML(callback) {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "scrollAndCapture") {
-        scrollAndCaptureHTML((html) => {
-            sendResponse({ html: html });
+        scrollAndCaptureHTML((num) => {
+            sendResponse({ num: num });
             chrome.runtime.sendMessage(
-                { action: "asyncJobCompleted", result: "HTML captured." },
+                {
+                    action: "asyncJobCompleted",
+                    result: `${num} posts has updated`,
+                },
                 (response) => {
                     console.log(
                         "message received from sendResponse: " +
