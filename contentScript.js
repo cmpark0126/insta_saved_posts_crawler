@@ -1,3 +1,22 @@
+function sendDataToServer(data) {
+    fetch("http://127.0.0.1:8000/items/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            accept: "application/json", // 수락 가능한 응답 타입 지정
+            // TODO: 인증 헤더 추가
+        },
+        body: JSON.stringify({
+            url: data.url,
+            content: data.content,
+            thumbnail: data.thumbnail,
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => console.log(data))
+        .catch((error) => console.error("Error:", error));
+}
+
 function crawlPostLinks() {
     const postsContainerXPath =
         "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div[3]/article/div[1]/div";
@@ -36,7 +55,7 @@ function crawlPostLinks() {
                 null
             ).singleNodeValue;
             if (postLink) {
-                console.log(postLink.href);
+                // console.log(postLink.href);
 
                 let postInner = document.evaluate(
                     "./div/div/img",
@@ -47,7 +66,13 @@ function crawlPostLinks() {
                 ).singleNodeValue;
                 if (postInner) {
                     // console.log(postInner.alt);
-                    console.log(postInner.src);
+                    // console.log(postInner.src);
+
+                    sendDataToServer({
+                        url: postLink.href,
+                        content: postInner.alt,
+                        thumbnail: postInner.src,
+                    });
                 }
             }
         }
