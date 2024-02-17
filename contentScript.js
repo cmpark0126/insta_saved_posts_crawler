@@ -4,37 +4,37 @@ let user = "";
 let token = "";
 
 async function sendDataToServer(data) {
-    chrome.runtime.sendMessage(
-        {
-            action: "sendDataToServer",
-            url: `${backendServerUrl}`,
-            req: {
-                method: "POST",
-                // mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json",
-                    accept: "application/json", // 수락 가능한 응답 타입 지정
-                    Authorization: `${token}`,
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+            {
+                action: "sendDataToServer",
+                url: `${backendServerUrl}`,
+                req: {
+                    method: "POST",
+                    // mode: "no-cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                        accept: "application/json", // 수락 가능한 응답 타입 지정
+                        Authorization: `${token}`,
+                    },
+                    body: JSON.stringify({
+                        url: `${data.url}`,
+                        content: `${data.content}`,
+                        thumbnail: `${data.thumbnail}`,
+                        user: `${user}`,
+                    }),
                 },
-                body: JSON.stringify({
-                    url: `${data.url}`,
-                    content: `${data.content}`,
-                    thumbnail: `${data.thumbnail}`,
-                    user: `${user}`,
-                }),
             },
-        },
-        (response) => {
-            console.log("message received from sendDataToServer: ", response);
-            if (response.hasUpdated) {
-                console.log("Item created");
-            } else {
-                console.log("Item already exists");
-            }
-        }
-    );
+            (response) => {
+                console.log(
+                    "message received from sendDataToServer: ",
+                    response
+                );
 
-    return Promise.resolve(false);
+                resolve(false);
+            }
+        );
+    });
 }
 
 async function crawlPostLinks() {
@@ -96,10 +96,13 @@ async function crawlPostLinks() {
                         content: postInner.alt,
                         thumbnail: postInner.src,
                     };
-                    hasUpdated = await sendDataToServer(data);
-
-                    if (hasUpdated) {
-                        numUpdated++;
+                    try {
+                        const hasUpdated = await sendDataToServer(data);
+                        if (hasUpdated) {
+                            numUpdated++;
+                        }
+                    } catch (error) {
+                        console.error("Error:", error);
                     }
                 }
             }

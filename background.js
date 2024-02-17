@@ -1,8 +1,6 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "sendDataToServer") {
         console.log("Sending data to server...");
-        console.log(message.url);
-        console.log(message.req);
         fetch(message.url, message.req).then((response) => {
             console.log("Response:", response);
 
@@ -21,9 +19,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             // }
 
             sendResponse({
-                hasUpdated: true,
+                message: response,
             });
         });
+
+        return true; // 비동기 응답을 위해 true를 반환
     }
 
     if (message.action === "asyncJobCompleted") {
