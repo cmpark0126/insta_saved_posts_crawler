@@ -3,11 +3,14 @@ function scrollAndCaptureHTML(callback) {
     let lastScrollHeight = 0;
   
     const intervalId = setInterval(() => {
+      console.log(`Scrolling ${scrolls} times...`);
+
       window.scrollTo(0, document.body.scrollHeight);
       const currentScrollHeight = document.body.scrollHeight;
   
       // 스크롤이 더 이상 변화가 없다면, 끝난 것으로 간주
       if (lastScrollHeight === currentScrollHeight) {
+        console.log("Scrolling finished.");
         clearInterval(intervalId);
         callback(document.documentElement.outerHTML);
       } else {
@@ -19,9 +22,14 @@ function scrollAndCaptureHTML(callback) {
   
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "scrollAndCapture") {
+      console.log("Start scrolling and capturing HTML...");
+
       scrollAndCaptureHTML((html) => {
         sendResponse({ html: html });
-      }, request.scrollDelay, request.maxScrolls);
+      });
+
+      console.log("Scrolling and capturing started.");
+
       return true; // 비동기 응답을 위해 true를 반환
     }
   });
