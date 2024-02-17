@@ -103,72 +103,42 @@ async function crawlPostLinks() {
 }
 
 async function scrollAndCaptureHTML(callback) {
-    let lastScrollHeight = 0;
-    let attempts = 0;
-    let skipByNoNewPosts = 0;
-    let countOfLoad = 0;
     let numAllUpdated = 0;
-    const maxAttempts = 10; // 최대 시도 횟수를 정의하여 무한 스크롤을 방지합니다.
-    const maxSkipNoNewPosts = 5; // 새로운 게시물이 없을 때 스크롤을 중지하는 최대 시도 횟수
+    let numHasDiff = 0;
+    let skipByNoNewPosts = 0;
+    const maxSkipNoNewPosts = 10; // 새로운 게시물이 없을 때 스크롤을 중지하는 최대 시도 횟수
 
     // 변화 감지를 위한 observer 생성
     const observer = new MutationObserver(async (mutations, obs) => {
-        const currentScrollHeight = document.body.scrollHeight;
+        const numUpdated = await crawlPostLinks();
+        console.log(`${numUpdated} posts has updated`);
 
-        if (
-            lastScrollHeight === currentScrollHeight &&
-            attempts < maxAttempts
-        ) {
-            attempts++;
-            setTimeout(
-                () => window.scrollTo(0, document.body.scrollHeight),
-                TIME
-            );
-            console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
-        } else if (attempts >= maxAttempts) {
-            // 최대 시도 횟수에 도달했거나 더 이상 콘텐츠가 로드되지 않을 경우
-            console.log("Scrolling finished or max attempts reached.");
+        if (numUpdated == 0 && skipByNoNewPosts >= maxSkipNoNewPosts) {
+            console.log("No new posts found and max skip reached.");
             console.log(
                 `Scrolling finished. ${numAllUpdated} posts has updated.`
             );
             obs.disconnect(); // Observer를 중지합니다.
             callback(numAllUpdated); // 콜백 함수 호출
-        } else {
-            countOfLoad++;
-            console.log("countOfLoad: " + countOfLoad);
-
-            const numUpdated = await crawlPostLinks();
-            console.log(`${numUpdated} posts has updated`);
-
-            if (numUpdated == 0 && skipByNoNewPosts >= maxSkipNoNewPosts) {
-                console.log("No new posts found and max skip reached.");
-                console.log(
-                    `Scrolling finished. ${numAllUpdated} posts has updated.`
-                );
-                obs.disconnect(); // Observer를 중지합니다.
-                callback(numAllUpdated); // 콜백 함수 호출
-                return;
-            } else if (numUpdated == 0) {
-                console.log(
-                    `No new posts found. Count up ${skipByNoNewPosts} / ${maxSkipNoNewPosts}.`
-                );
-                skipByNoNewPosts++;
-            } else {
-                console.log("New posts found. Reset skip count.");
-                skipByNoNewPosts = 0;
-            }
-
-            numAllUpdated += numUpdated;
-
-            attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
-            setTimeout(
-                () => window.scrollTo(0, document.body.scrollHeight),
-                TIME
+            return;
+        } else if (numUpdated == 0) {
+            console.log(
+                `No new posts found. Retry ${skipByNoNewPosts} / ${maxSkipNoNewPosts}.`
             );
-            console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
-
-            lastScrollHeight = currentScrollHeight;
+            skipByNoNewPosts++;
+        } else {
+            numHasDiff++;
+            skipByNoNewPosts = 0;
+            console.log("New posts found. Reset skip count.");
+            console.log(
+                `Total ${numHasDiff} times new posts found. Total ${numAllUpdated} posts has updated.`
+            );
         }
+
+        numAllUpdated += numUpdated;
+
+        attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
+        setTimeout(() => window.scrollTo(0, document.body.scrollHeight), TIME);
     });
 
     // 문서 전체에 대한 변화 감지 시작
