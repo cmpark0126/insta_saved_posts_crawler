@@ -140,7 +140,7 @@ async function scrollAndCaptureHTML(callback) {
             console.log(`${numUpdated} posts has updated`);
 
             if (numUpdated == 0 && skipByNoNewPosts >= maxSkipNoNewPosts) {
-                console.log("No new posts found.");
+                console.log("No new posts found and max skip reached.");
                 console.log(
                     `Scrolling finished. ${numAllUpdated} posts has updated.`
                 );
@@ -148,8 +148,12 @@ async function scrollAndCaptureHTML(callback) {
                 callback(numAllUpdated); // 콜백 함수 호출
                 return;
             } else if (numUpdated == 0) {
+                console.log(
+                    `No new posts found. Count up ${skipByNoNewPosts} / ${maxSkipNoNewPosts}.`
+                );
                 skipByNoNewPosts++;
             } else {
+                console.log("New posts found. Reset skip count.");
                 skipByNoNewPosts = 0;
             }
 
