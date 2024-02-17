@@ -168,18 +168,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         scrollAndCaptureHTML((num) => {
             sendResponse({ num: num });
-            chrome.runtime.sendMessage(
-                {
-                    action: "asyncJobCompleted",
-                    result: `${num} posts has updated`,
-                },
-                (response) => {
-                    console.log(
-                        "message received from sendResponse: " +
-                            response.message
-                    );
-                }
-            );
+            // chrome.runtime.sendMessage(
+            //     {
+            //         action: "asyncJobCompleted",
+            //         result: `${num} posts has updated`,
+            //     },
+            //     (response) => {
+            //         console.log(
+            //             "message received from sendResponse: " +
+            //                 response.message
+            //         );
+            //     }
+            // );
         }).catch((error) => {
             console.error("Error:", error);
             sendResponse({ error: error });
