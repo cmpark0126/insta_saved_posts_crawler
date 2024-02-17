@@ -1,9 +1,24 @@
+function crawlPostLinks() {
+    const postsContainerXPath = '/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div[3]/article/div[1]/div';
+    const postsContainer = document.evaluate(postsContainerXPath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0);
+    const postBuckets = document.evaluate('./div', postsContainer, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    for (let i = 0; i < postBuckets.snapshotLength; i++) {
+        let postBucket = postBuckets.snapshotItem(i);
+        let posts = document.evaluate('./div', postBucket, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+        for (let j = 0; j < posts.snapshotLength; j++) {
+            let post = posts.snapshotItem(j);
+            let postLink = document.evaluate('./a', post, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+            if (postLink) {
+                console.log(postLink.href);
+            }
+        }
+        }
+    }
+
 function scrollAndCaptureHTML(callback) {
     let lastScrollHeight = 0;
     let attempts = 0;
     let countOfLoad = 0;
-    let postLinks = new Set();
-    const postsContainerXPath = '/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div[3]/article/div[1]/div';
     const maxAttempts = 10; // 최대 시도 횟수를 정의하여 무한 스크롤을 방지합니다.
 
     // 변화 감지를 위한 observer 생성
@@ -23,20 +38,7 @@ function scrollAndCaptureHTML(callback) {
             countOfLoad++;
             console.log('countOfLoad: ' + countOfLoad);
 
-            const postsContainer = document.evaluate(postsContainerXPath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0);
-            const postBuckets = document.evaluate('./div', postsContainer, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-            for (let i = 0; i < postBuckets.snapshotLength; i++) {
-                let postBucket = postBuckets.snapshotItem(i);
-                let posts = document.evaluate('./div', postBucket, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                for (let j = 0; j < posts.snapshotLength; j++) {
-                    let post = posts.snapshotItem(j);
-                    let postLink = document.evaluate('./a', post, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                    if (postLink) {
-                        console.log(postLink.href);
-                        postLinks.add(postLink.href);
-                    }
-                }
-              }
+            crawlPostLinks();
 
             lastScrollHeight = currentScrollHeight;
             attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
