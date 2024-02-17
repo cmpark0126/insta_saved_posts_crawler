@@ -1,4 +1,15 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "sendDataToServer") {
+        console.log("Sending data to server...");
+        console.log(message.url);
+        console.log(message.req);
+        fetch(message.url, message.req).then((response) => {
+            sendResponse({
+                inner: response,
+            });
+        });
+    }
+
     if (message.action === "asyncJobCompleted") {
         console.log("Async job completed in background script.");
 

@@ -4,23 +4,54 @@ let user = "";
 let token = "";
 
 async function sendDataToServer(data) {
-    const response = await fetch(`${backendServerUrl}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            accept: "application/json", // 수락 가능한 응답 타입 지정
-            Authorization: `${token}`,
+    let response = null;
+
+    chrome.runtime.sendMessage(
+        {
+            action: "sendDataToServer",
+            url: `${backendServerUrl}`,
+            req: {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    accept: "application/json", // 수락 가능한 응답 타입 지정
+                    Authorization: `${token}`,
+                },
+                body: JSON.stringify({
+                    url: `${data.url}`,
+                    content: `${data.content}`,
+                    thumbnail: `${data.thumbnail}`,
+                    user: `${user}`,
+                }),
+            },
         },
-        body: JSON.stringify({
-            url: data.url,
-            content: data.content,
-            thumbnail: data.thumbnail,
-            user: user,
-        }),
-    });
+        (returned) => {
+            response = returned.inner;
+        }
+    );
+
+    // NOTE: if send request directly from content script,
+    // it will be blocked by CORS policy or make http to https automatically
+
+    // const response = await fetch(`${backendServerUrl}`, {
+    //     method: "POST",
+    //     headers: {
+    //         "Content-Type": "application/json",
+    //         accept: "application/json", // 수락 가능한 응답 타입 지정
+    //         Authorization: `${token}`,
+    //     },
+    //     body: JSON.stringify({
+    //         url: `${data.url}`,
+    //         content: `${data.content}`,
+    //         thumbnail: `${data.thumbnail}`,
+    //         user: `${user}`,
+    //     }),
+    // });
+
     const responseData = await response.json().catch((error) => {
         console.error("Error:", error);
     });
+
     console.log("Response data:", responseData.detail);
     if (responseData.detail === "Item already exists") {
         return Promise.resolve(false); // Item already exists
@@ -28,7 +59,7 @@ async function sendDataToServer(data) {
         return Promise.resolve(true); // Item created
     } else {
         console.error("unexpected response:", responseData);
-        throw new Error("unexpected response");
+        return Promise.resolve(false);
     }
     // console.log("Data to send:", data.url);
     // return Promise.resolve(true);
