@@ -4,14 +4,13 @@ let user = "";
 let token = "";
 
 async function sendDataToServer(data) {
-    let response = null;
-
     chrome.runtime.sendMessage(
         {
             action: "sendDataToServer",
             url: `${backendServerUrl}`,
             req: {
                 method: "POST",
+                // mode: "no-cors",
                 headers: {
                     "Content-Type": "application/json",
                     accept: "application/json", // 수락 가능한 응답 타입 지정
@@ -25,44 +24,17 @@ async function sendDataToServer(data) {
                 }),
             },
         },
-        (returned) => {
-            response = returned.inner;
+        (response) => {
+            console.log("message received from sendDataToServer: ", response);
+            if (response.hasUpdated) {
+                console.log("Item created");
+            } else {
+                console.log("Item already exists");
+            }
         }
     );
 
-    // NOTE: if send request directly from content script,
-    // it will be blocked by CORS policy or make http to https automatically
-
-    // const response = await fetch(`${backendServerUrl}`, {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type": "application/json",
-    //         accept: "application/json", // 수락 가능한 응답 타입 지정
-    //         Authorization: `${token}`,
-    //     },
-    //     body: JSON.stringify({
-    //         url: `${data.url}`,
-    //         content: `${data.content}`,
-    //         thumbnail: `${data.thumbnail}`,
-    //         user: `${user}`,
-    //     }),
-    // });
-
-    const responseData = await response.json().catch((error) => {
-        console.error("Error:", error);
-    });
-
-    console.log("Response data:", responseData.detail);
-    if (responseData.detail === "Item already exists") {
-        return Promise.resolve(false); // Item already exists
-    } else if (responseData.detail === "Item created") {
-        return Promise.resolve(true); // Item created
-    } else {
-        console.error("unexpected response:", responseData);
-        return Promise.resolve(false);
-    }
-    // console.log("Data to send:", data.url);
-    // return Promise.resolve(true);
+    return Promise.resolve(false);
 }
 
 async function crawlPostLinks() {
@@ -119,11 +91,12 @@ async function crawlPostLinks() {
                     // console.log(postInner.src);
 
                     // if updated, has_updated will be true
-                    hasUpdated = await sendDataToServer({
+                    const data = {
                         url: postLink.href,
                         content: postInner.alt,
                         thumbnail: postInner.src,
-                    });
+                    };
+                    hasUpdated = await sendDataToServer(data);
 
                     if (hasUpdated) {
                         numUpdated++;

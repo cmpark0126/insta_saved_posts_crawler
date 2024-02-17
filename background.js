@@ -4,8 +4,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log(message.url);
         console.log(message.req);
         fetch(message.url, message.req).then((response) => {
+            console.log("Response:", response);
+
+            // const responseData = await response.json().catch((error) => {
+            //     console.error("Error:", error);
+            // });
+
+            // console.log("Response data:", responseData.detail);
+            // if (responseData.detail === "Item already exists") {
+            //     return Promise.resolve(false); // Item already exists
+            // } else if (responseData.detail === "Item created") {
+            //     return Promise.resolve(true); // Item created
+            // } else {
+            //     console.error("unexpected response:", responseData);
+            //     return Promise.resolve(false);
+            // }
+
             sendResponse({
-                inner: response,
+                hasUpdated: true,
             });
         });
     }
