@@ -1,3 +1,5 @@
+const TIME = 1000; // 1 second
+
 async function sendDataToServer(data) {
     const response = await fetch("http://127.0.0.1:8000/items/", {
         method: "POST",
@@ -102,9 +104,11 @@ async function crawlPostLinks() {
 async function scrollAndCaptureHTML(callback) {
     let lastScrollHeight = 0;
     let attempts = 0;
+    let skipByNoNewPosts = 0;
     let countOfLoad = 0;
     let numAllUpdated = 0;
     const maxAttempts = 10; // 최대 시도 횟수를 정의하여 무한 스크롤을 방지합니다.
+    const maxSkipNoNewPosts = 5; // 새로운 게시물이 없을 때 스크롤을 중지하는 최대 시도 횟수
 
     // 변화 감지를 위한 observer 생성
     const observer = new MutationObserver(async (mutations, obs) => {
@@ -117,7 +121,7 @@ async function scrollAndCaptureHTML(callback) {
             attempts++;
             setTimeout(
                 () => window.scrollTo(0, document.body.scrollHeight),
-                1000
+                TIME
             );
             console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
         } else if (attempts >= maxAttempts) {
@@ -135,7 +139,7 @@ async function scrollAndCaptureHTML(callback) {
             const numUpdated = await crawlPostLinks();
             console.log(`${numUpdated} posts has updated`);
 
-            if (numUpdated == 0) {
+            if (numUpdated == 0 && skipByNoNewPosts >= maxSkipNoNewPosts) {
                 console.log("No new posts found.");
                 console.log(
                     `Scrolling finished. ${numAllUpdated} posts has updated.`
@@ -143,16 +147,22 @@ async function scrollAndCaptureHTML(callback) {
                 obs.disconnect(); // Observer를 중지합니다.
                 callback(numAllUpdated); // 콜백 함수 호출
                 return;
+            } else if (numUpdated == 0) {
+                skipByNoNewPosts++;
+            } else {
+                skipByNoNewPosts = 0;
             }
+
             numAllUpdated += numUpdated;
 
-            lastScrollHeight = currentScrollHeight;
             attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
             setTimeout(
                 () => window.scrollTo(0, document.body.scrollHeight),
-                1000
+                TIME
             );
             console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
+
+            lastScrollHeight = currentScrollHeight;
         }
     });
 
