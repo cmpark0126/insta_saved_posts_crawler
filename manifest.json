@@ -1,9 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "Instagram Saved Post Crawl",
+    "name": "Instagram Saved Posts Crawler",
     "version": "1.0",
+    "description": "Crawl and save your Instagram saved posts locally.",
     "permissions": [
-        "activeTab"
+        "activeTab",
+        "storage"
     ],
     "background": {
         "service_worker": "background.js"
@@ -14,16 +16,16 @@
                 "https://www.instagram.com/*"
             ],
             "js": [
-                "crawlScript.js"
+                "contentScript.js"
             ]
         }
     ],
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
-            "16": "images/icon16.png",
-            "48": "images/icon48.png",
-            "128": "images/icon128.png"
+            "16": "icon16.png",
+            "48": "icon48.png",
+            "128": "icon128.png"
         }
     }
 }
