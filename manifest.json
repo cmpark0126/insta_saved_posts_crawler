@@ -3,9 +3,6 @@
     "name": "Instagram Saved Posts Crawler",
     "version": "1.0",
     "description": "Crawl and save your Instagram saved posts locally.",
-    "background": {
-        "service_worker": "background.js"
-    },
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
@@ -20,6 +17,9 @@
         "scripting",
         "notifications"
     ],
+    "background": {
+        "service_worker": "background.js"
+    },
     "content_scripts": [
         {
             "matches": [
