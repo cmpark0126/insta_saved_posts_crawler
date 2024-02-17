@@ -37,6 +37,18 @@ function crawlPostLinks() {
             ).singleNodeValue;
             if (postLink) {
                 console.log(postLink.href);
+
+                let postInner = document.evaluate(
+                    "./div/div/img",
+                    postLink,
+                    null,
+                    XPathResult.FIRST_ORDERED_NODE_TYPE,
+                    null
+                ).singleNodeValue;
+                if (postInner) {
+                    // console.log(postInner.alt);
+                    console.log(postInner.src);
+                }
             }
         }
     }
