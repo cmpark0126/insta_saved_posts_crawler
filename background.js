@@ -1,26 +1,35 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "sendDataToServer") {
         console.log("Sending data to server...");
-        fetch(message.url, message.req).then((response) => {
-            console.log("Response:", response);
 
-            // const responseData = await response.json().catch((error) => {
-            //     console.error("Error:", error);
-            // });
+        async function fetchData() {
+            try {
+                // fetch 요청을 수행하고 응답을 기다립니다.
+                const response = await fetch(message.url, message.req);
+                if (response.ok) {
+                    console.log("Response is ok.");
+                    sendResponse(true);
+                } else {
+                    const data = await response.json();
 
-            // console.log("Response data:", responseData.detail);
-            // if (responseData.detail === "Item already exists") {
-            //     return Promise.resolve(false); // Item already exists
-            // } else if (responseData.detail === "Item created") {
-            //     return Promise.resolve(true); // Item created
-            // } else {
-            //     console.error("unexpected response:", responseData);
-            //     return Promise.resolve(false);
-            // }
+                    // NOTE: pocketbase 서버의 응답 형식을 따릅니다.
+                    console.log("Error:", data);
 
-            sendResponse({
-                message: response,
-            });
+                    if (data.data.url.code === "validation_not_unique") {
+                        console.log("Value must be unique.");
+                        sendResponse(false);
+                    } else {
+                        throw new Error(`Error: ${data} (${data.code})`);
+                    }
+                }
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        fetchData().catch((error) => {
+            console.error("Error:", error);
+            throw error;
         });
 
         return true; // 비동기 응답을 위해 true를 반환

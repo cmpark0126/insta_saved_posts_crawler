@@ -26,12 +26,11 @@ async function sendDataToServer(data) {
                 },
             },
             (response) => {
-                console.log(
-                    "message received from sendDataToServer: ",
-                    response
-                );
-
-                resolve(false);
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError.message);
+                } else {
+                    resolve(response);
+                }
             }
         );
     });
@@ -96,13 +95,9 @@ async function crawlPostLinks() {
                         content: postInner.alt,
                         thumbnail: postInner.src,
                     };
-                    try {
-                        const hasUpdated = await sendDataToServer(data);
-                        if (hasUpdated) {
-                            numUpdated++;
-                        }
-                    } catch (error) {
-                        console.error("Error:", error);
+                    const hasUpdated = await sendDataToServer(data);
+                    if (hasUpdated) {
+                        numUpdated++;
                     }
                 }
             }
