@@ -1,19 +1,46 @@
 function crawlPostLinks() {
-    const postsContainerXPath = '/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div[3]/article/div[1]/div';
-    const postsContainer = document.evaluate(postsContainerXPath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotItem(0);
-    const postBuckets = document.evaluate('./div', postsContainer, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+    const postsContainerXPath =
+        "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div[3]/article/div[1]/div";
+    const postsContainer = document
+        .evaluate(
+            postsContainerXPath,
+            document,
+            null,
+            XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+            null
+        )
+        .snapshotItem(0);
+    const postBuckets = document.evaluate(
+        "./div",
+        postsContainer,
+        null,
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+        null
+    );
     for (let i = 0; i < postBuckets.snapshotLength; i++) {
         let postBucket = postBuckets.snapshotItem(i);
-        let posts = document.evaluate('./div', postBucket, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+        let posts = document.evaluate(
+            "./div",
+            postBucket,
+            null,
+            XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+            null
+        );
         for (let j = 0; j < posts.snapshotLength; j++) {
             let post = posts.snapshotItem(j);
-            let postLink = document.evaluate('./a', post, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+            let postLink = document.evaluate(
+                "./a",
+                post,
+                null,
+                XPathResult.FIRST_ORDERED_NODE_TYPE,
+                null
+            ).singleNodeValue;
             if (postLink) {
                 console.log(postLink.href);
             }
         }
-        }
     }
+}
 
 function scrollAndCaptureHTML(callback) {
     let lastScrollHeight = 0;
@@ -25,9 +52,15 @@ function scrollAndCaptureHTML(callback) {
     const observer = new MutationObserver((mutations, obs) => {
         const currentScrollHeight = document.body.scrollHeight;
 
-        if (lastScrollHeight === currentScrollHeight && attempts < maxAttempts) {
+        if (
+            lastScrollHeight === currentScrollHeight &&
+            attempts < maxAttempts
+        ) {
             attempts++;
-            setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 1000);
+            setTimeout(
+                () => window.scrollTo(0, document.body.scrollHeight),
+                1000
+            );
             console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
         } else if (attempts >= maxAttempts) {
             // 최대 시도 횟수에 도달했거나 더 이상 콘텐츠가 로드되지 않을 경우
@@ -36,13 +69,16 @@ function scrollAndCaptureHTML(callback) {
             callback(document.documentElement.outerHTML); // 콜백 함수 호출
         } else {
             countOfLoad++;
-            console.log('countOfLoad: ' + countOfLoad);
+            console.log("countOfLoad: " + countOfLoad);
 
             crawlPostLinks();
 
             lastScrollHeight = currentScrollHeight;
             attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
-            setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 1000);
+            setTimeout(
+                () => window.scrollTo(0, document.body.scrollHeight),
+                1000
+            );
             console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
         }
     });
@@ -50,27 +86,32 @@ function scrollAndCaptureHTML(callback) {
     // 문서 전체에 대한 변화 감지 시작
     observer.observe(document, {
         childList: true,
-        subtree: true
+        subtree: true,
     });
 
-    console.log('observer started');
+    console.log("observer started");
 
     // 초기 스크롤 시작
     window.scrollTo(0, document.body.scrollHeight);
 }
-  
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "scrollAndCapture") {
-      scrollAndCaptureHTML((html) => {
-        sendResponse({ html: html });
-        chrome.runtime.sendMessage({ action: "asyncJobCompleted", result: "HTML captured."}, (response) => {
-            console.log('message received from sendResponse: ' + response.message);
+        scrollAndCaptureHTML((html) => {
+            sendResponse({ html: html });
+            chrome.runtime.sendMessage(
+                { action: "asyncJobCompleted", result: "HTML captured." },
+                (response) => {
+                    console.log(
+                        "message received from sendResponse: " +
+                            response.message
+                    );
+                }
+            );
         });
-      });
 
-      console.log("Scrolling and capturing started.");
+        console.log("Scrolling and capturing started.");
 
-      return true; // 비동기 응답을 위해 true를 반환
+        return true; // 비동기 응답을 위해 true를 반환
     }
-  });
-  
+});
