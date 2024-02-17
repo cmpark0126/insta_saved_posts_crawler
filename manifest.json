@@ -15,6 +15,7 @@
         "activeTab",
         "storage",
         "scripting",
+        "alarms",
         "notifications"
     ],
     "background": {

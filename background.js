@@ -6,7 +6,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.notifications.create('', {
         type: 'basic',
         iconUrl: 'images/icon48.png',
-        title: 'Async Job Notification',
+        title: 'Instagram Crawler',
         message: message.result,
         priority: 2
       });
