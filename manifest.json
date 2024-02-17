@@ -17,15 +17,5 @@
     "permissions": [
         "activeTab",
         "storage"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "https://www.instagram.com/*"
-            ],
-            "js": [
-                "contentScript.js"
-            ]
-        }
     ]
 }
