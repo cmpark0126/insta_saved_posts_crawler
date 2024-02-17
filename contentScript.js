@@ -10,8 +10,8 @@ function scrollAndCaptureHTML(callback) {
 
         if (lastScrollHeight === currentScrollHeight && attempts < maxAttempts) {
             attempts++;
-            console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
             setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 1000);
+            console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
         } else if (attempts >= maxAttempts) {
             // 최대 시도 횟수에 도달했거나 더 이상 콘텐츠가 로드되지 않을 경우
             console.log("Scrolling finished or max attempts reached.");
@@ -24,6 +24,7 @@ function scrollAndCaptureHTML(callback) {
             lastScrollHeight = currentScrollHeight;
             attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
             setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 1000);
+            console.log(`Scrolling attempt ${attempts}/${maxAttempts}.`);
         }
     });
 
