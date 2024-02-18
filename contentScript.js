@@ -1,3 +1,5 @@
+// const ExcelJS = require("lib/exceljs.min.js");
+
 const TIME = 1000; // 1 second
 let setOfUrls = new Set();
 let ListOfPosts = new Array();
@@ -150,6 +152,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             //     action: "saveExcelOnBackground",
             //     result: `${num} posts has updated`,
             // });
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet("My Sheet");
+
+            worksheet.columns = [
+                { header: "URL", key: "url" },
+                { header: "Title", key: "title" },
+                { header: "Image", key: "image" },
+            ];
+            worksheet.addRows(ListOfPosts);
+
+            workbook.xlsx.writeBuffer().then(function (buffer) {
+                const blob = new Blob([buffer], {
+                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "example.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+
             sendResponse({ num: num });
         }, request.maxPostsToCapture).catch((error) => {
             console.error("Error:", error);
