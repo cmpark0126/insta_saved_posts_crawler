@@ -67,6 +67,7 @@ function crawlPostLinks() {
                         );
                         continue;
                     }
+                    setOfPosts.add(postLink.href);
 
                     sendDataToBackground({
                         url: postLink.href,
