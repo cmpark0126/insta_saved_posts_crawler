@@ -10,9 +10,11 @@
 
     <body>
         <div id="status">Ready to crawl your saved Instagram posts!</div>
-        <input type="text" id="urlInput" placeholder="Query URL을 입력하세요" />
-        <input type="text" id="userInput" placeholder="User를 입력하세요" />
-        <input type="text" id="tokenInput" placeholder="Token을 입력하세요" />
+        <input
+            type="number"
+            id="maxPostsToCapture"
+            placeholder="최대로 크롤링할 Post 개수"
+        />
         <button id="startButton">Start</button>
         <div id="numPosts"></div>
         <script src="popup.js"></script>

@@ -1,6 +1,6 @@
 # insta_saved_post_crawl
 
-<span style="color: red;">이 크롤러는 개인적으로 활용하기 위해서 개발한 것으로 보안상 위협적일 수 있는 구현을 포함합니다. 무단 배포 및 수정을 철저하게 금지합니다. </span>
+**이 크롤러는 개인적으로 활용하기 위해서 개발한 것으로 보안상 위협적일 수 있는 구현을 포함합니다. 무단 배포 및 수정을 철저하게 금지합니다.**
 
 ## download repository as a zip file
 
@@ -42,19 +42,23 @@
 
 ---
 
-## copy query url, user, token from blog main page and paste it to extension, and click start
+## set maximum number of posts you want to capture and click start
 
-![5_1_copy](assets/5_1_copy.png)
+![set](asset/5_1_set.png)
 
-![5_2_paste](assets/5_2_paste.png)
-
-<span style="color: red;">크롤링이 진행되는 동안에는 다른 작업을 하면 크롤링이 일시 중지될 수 있습니다.</span>
+-   **please do nothing until complete crawling**
 
 ---
 
-## check whether blog is updated
+## check downloaded file from extension
 
-![6_1_blog](assets/6_1_blog.png)
+## ![download](assets/6_1_download.png)
+
+---
+
+## drop-down excel file into blog to update database
+
+TODO
 
 ---
 

@@ -24,7 +24,7 @@
     "content_scripts": [
         {
             "matches": ["https://www.instagram.com/*/saved/all-posts/"],
-            "js": ["contentScript.js"]
+            "js": ["lib/exceljs.min.js", "contentScript.js"]
         }
     ]
 }
