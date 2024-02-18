@@ -1,12 +1,6 @@
 const TIME = 1000; // 1 second
-let setOfPosts = new Set();
-
-function sendDataToBackground(post) {
-    chrome.runtime.sendMessage({
-        action: "saveDataOnBackground",
-        post: post,
-    });
-}
+let setOfUrls = new Set();
+let ListOfPosts = new Array();
 
 function crawlPostLinks() {
     let numCaptured = 0;
@@ -61,19 +55,21 @@ function crawlPostLinks() {
                     // console.log(postInner.alt);
                     // console.log(postInner.src);
 
-                    if (setOfPosts.has(postLink.href)) {
-                        console.log(
-                            `post of ${postLink.href} has already been captured.`
-                        );
+                    if (setOfUrls.has(postLink.href)) {
+                        // console.log(
+                        //     `post of ${postLink.href} has already been captured.`
+                        // );
                         continue;
                     }
-                    setOfPosts.add(postLink.href);
+                    setOfUrls.add(postLink.href);
 
-                    sendDataToBackground({
-                        url: postLink.href,
-                        content: postInner.alt,
-                        thumbnail: postInner.src,
-                    });
+                    ListOfPosts.push([
+                        postLink.href,
+                        postInner.alt,
+                        postInner.src,
+                    ]);
+
+                    console.log(`post of ${postLink.href} has captured.`);
                     numCaptured++;
                 }
             }
@@ -150,10 +146,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         );
 
         scrollAndCaptureHTML((num) => {
-            chrome.runtime.sendMessage({
-                action: "saveExcelOnBackground",
-                result: `${num} posts has updated`,
-            });
+            // chrome.runtime.sendMessage({
+            //     action: "saveExcelOnBackground",
+            //     result: `${num} posts has updated`,
+            // });
             sendResponse({ num: num });
         }, request.maxPostsToCapture).catch((error) => {
             console.error("Error:", error);
