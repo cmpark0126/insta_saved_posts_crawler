@@ -125,8 +125,14 @@ async function scrollAndCaptureHTML(callback, maxPostsToCapture = 1000) {
             );
         }
 
-        attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
-        setTimeout(() => window.scrollTo(0, document.body.scrollHeight), TIME);
+        setTimeout(
+            () =>
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: "smooth",
+                }),
+            TIME
+        );
     });
 
     // 문서 전체에 대한 변화 감지 시작
@@ -138,7 +144,10 @@ async function scrollAndCaptureHTML(callback, maxPostsToCapture = 1000) {
     console.log("observer started");
 
     // 초기 스크롤 시작
-    window.scrollTo(0, document.body.scrollHeight);
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth",
+    });
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
