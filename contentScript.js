@@ -176,6 +176,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
 
             sendResponse({ num: num });
+
+            chrome.runtime.sendMessage(
+                {
+                    action: "asyncJobCompleted",
+                    result: `${num} posts has crawled and saved into posts.xlsx.`,
+                },
+                (response) => {
+                    console.log(
+                        "message received from sendResponse: " +
+                            response.message
+                    );
+                }
+            );
         }, request.maxPostsToCapture).catch((error) => {
             console.error("Error:", error);
             sendResponse({ error: error });
