@@ -82,7 +82,7 @@ function crawlPostLinks() {
 }
 
 async function scrollAndCaptureHTML(callback, maxPostsToCapture = 1000) {
-    let numAllUpdated = 0;
+    let numAllUpdated = ListOfPosts.length; // 이미 캡쳐된 게시물 수
     let numHasDiff = 0;
     let skipByNoNewPosts = 0;
     const maxSkipNoNewPosts = 10; // 새로운 게시물이 없을 때 스크롤을 중지하는 최대 시도 횟수
@@ -125,8 +125,14 @@ async function scrollAndCaptureHTML(callback, maxPostsToCapture = 1000) {
             );
         }
 
-        attempts = 0; // 시도 횟수를 초기화하고 계속 스크롤합니다.
-        setTimeout(() => window.scrollTo(0, document.body.scrollHeight), TIME);
+        setTimeout(
+            () =>
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: "smooth",
+                }),
+            TIME
+        );
     });
 
     // 문서 전체에 대한 변화 감지 시작
@@ -138,7 +144,47 @@ async function scrollAndCaptureHTML(callback, maxPostsToCapture = 1000) {
     console.log("observer started");
 
     // 초기 스크롤 시작
-    window.scrollTo(0, document.body.scrollHeight);
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth",
+    });
+}
+
+function saveExcelAndNotify(num) {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("My Sheet");
+
+    worksheet.columns = [
+        { header: "url", key: "url" },
+        { header: "content", key: "content" },
+        { header: "thumbnail", key: "thumbnail" },
+    ];
+    worksheet.addRows(ListOfPosts);
+
+    workbook.xlsx.writeBuffer().then(function (buffer) {
+        const blob = new Blob([buffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "posts.xlsx";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+
+    chrome.runtime.sendMessage(
+        {
+            action: "asyncJobCompleted",
+            result: `${num} posts has crawled and saved into posts.xlsx.`,
+        },
+        (response) => {
+            console.log(
+                "message received from sendResponse: " + response.message
+            );
+        }
+    );
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -148,51 +194,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         );
 
         scrollAndCaptureHTML((num) => {
-            // chrome.runtime.sendMessage({
-            //     action: "saveExcelOnBackground",
-            //     result: `${num} posts has updated`,
-            // });
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet("My Sheet");
-
-            worksheet.columns = [
-                { header: "url", key: "url" },
-                { header: "content", key: "content" },
-                { header: "thumbnail", key: "thumbnail" },
-            ];
-            worksheet.addRows(ListOfPosts);
-
-            workbook.xlsx.writeBuffer().then(function (buffer) {
-                const blob = new Blob([buffer], {
-                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "posts.xlsx";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            });
-
             sendResponse({ num: num });
-
-            chrome.runtime.sendMessage(
-                {
-                    action: "asyncJobCompleted",
-                    result: `${num} posts has crawled and saved into posts.xlsx.`,
-                },
-                (response) => {
-                    console.log(
-                        "message received from sendResponse: " +
-                            response.message
-                    );
-                }
-            );
+            saveExcelAndNotify(num);
         }, request.maxPostsToCapture).catch((error) => {
             console.error("Error:", error);
             sendResponse({ error: error });
         });
+
+        console.log("Scrolling and capturing started.");
+
+        return true; // 비동기 응답을 위해 true를 반환
+    }
+
+    if (request.action === "saveExcelManually") {
+        console.log(
+            `scrollAndCaptureHTML: maxPostsToCapture=${request.maxPostsToCapture}`
+        );
+
+        let num = ListOfPosts.length;
+        sendResponse({ num: num });
+        saveExcelAndNotify(num);
 
         console.log("Scrolling and capturing started.");
 
