@@ -1,43 +1,15 @@
 const TIME = 1000; // 1 second
-let backendServerUrl = ""; // e.g., "http://127.0.0.1:8000/items/"
-let user = "";
-let token = "";
+let setOfPosts = new Set();
 
-async function sendDataToServer(data) {
-    return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage(
-            {
-                action: "sendDataToServer",
-                url: `${backendServerUrl}`,
-                req: {
-                    method: "POST",
-                    // mode: "no-cors",
-                    headers: {
-                        "Content-Type": "application/json",
-                        accept: "application/json", // 수락 가능한 응답 타입 지정
-                        Authorization: `${token}`,
-                    },
-                    body: JSON.stringify({
-                        url: `${data.url}`,
-                        content: `${data.content}`,
-                        thumbnail: `${data.thumbnail}`,
-                        user: `${user}`,
-                    }),
-                },
-            },
-            (response) => {
-                if (chrome.runtime.lastError) {
-                    reject(chrome.runtime.lastError.message);
-                } else {
-                    resolve(response);
-                }
-            }
-        );
+function sendDataToBackground(post) {
+    chrome.runtime.sendMessage({
+        action: "saveDataOnBackground",
+        post: post,
     });
 }
 
-async function crawlPostLinks() {
-    let numUpdated = 0;
+function crawlPostLinks() {
+    let numCaptured = 0;
 
     const postsContainerXPath =
         "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div[3]/article/div[1]/div";
@@ -89,25 +61,28 @@ async function crawlPostLinks() {
                     // console.log(postInner.alt);
                     // console.log(postInner.src);
 
-                    // if updated, has_updated will be true
-                    const data = {
+                    if (setOfPosts.has(postLink.href)) {
+                        console.log(
+                            `post of ${postLink.href} has already been captured.`
+                        );
+                        continue;
+                    }
+
+                    sendDataToBackground({
                         url: postLink.href,
                         content: postInner.alt,
                         thumbnail: postInner.src,
-                    };
-                    const hasUpdated = await sendDataToServer(data);
-                    if (hasUpdated) {
-                        numUpdated++;
-                    }
+                    });
+                    numCaptured++;
                 }
             }
         }
     }
 
-    return numUpdated;
+    return numCaptured;
 }
 
-async function scrollAndCaptureHTML(callback) {
+async function scrollAndCaptureHTML(callback, maxPostsToCapture = 1000) {
     let numAllUpdated = 0;
     let numHasDiff = 0;
     let skipByNoNewPosts = 0;
@@ -115,26 +90,36 @@ async function scrollAndCaptureHTML(callback) {
 
     // 변화 감지를 위한 observer 생성
     const observer = new MutationObserver(async (mutations, obs) => {
-        const numUpdated = await crawlPostLinks();
-        console.log(`${numUpdated} posts has updated`);
-
-        if (numUpdated == 0 && skipByNoNewPosts >= maxSkipNoNewPosts) {
-            console.log("No new posts found and max skip reached.");
+        let numCaptured = crawlPostLinks();
+        console.log(`${numCaptured} posts has captured.`);
+        numAllUpdated += numCaptured;
+        if (numAllUpdated >= maxPostsToCapture) {
             console.log(
-                `Scrolling finished. ${numAllUpdated} posts has updated.`
+                `Max posts to capture reached: ${numAllUpdated} / ${maxPostsToCapture}.`
             );
             obs.disconnect(); // Observer를 중지합니다.
             callback(numAllUpdated); // 콜백 함수 호출
             return;
-        } else if (numUpdated == 0) {
-            skipByNoNewPosts++;
-            console.log(
-                `No new posts found. Retry ${skipByNoNewPosts} / ${maxSkipNoNewPosts}.`
-            );
+        }
+
+        if (numCaptured == 0) {
+            if (skipByNoNewPosts >= maxSkipNoNewPosts) {
+                console.log("No new posts found and max skip reached.");
+                console.log(
+                    `Scrolling finished. ${numAllUpdated} posts has updated.`
+                );
+                obs.disconnect(); // Observer를 중지합니다.
+                callback(numAllUpdated); // 콜백 함수 호출
+                return;
+            } else {
+                skipByNoNewPosts++;
+                console.log(
+                    `No new posts found. Retry ${skipByNoNewPosts} / ${maxSkipNoNewPosts}.`
+                );
+            }
         } else {
             numHasDiff++;
             skipByNoNewPosts = 0;
-            numAllUpdated += numUpdated;
             console.log("New posts found. Reset skip count.");
             console.log(
                 `Total ${numHasDiff} times new posts found. Total ${numAllUpdated} posts has updated.`
@@ -159,28 +144,17 @@ async function scrollAndCaptureHTML(callback) {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "scrollAndCapture") {
-        backendServerUrl = request.url;
-        user = request.user;
-        token = request.token;
-        console.log("Set backendServerUrl:", backendServerUrl);
-        console.log("Set user:", user);
-        console.log("Set token:", token);
+        console.log(
+            `scrollAndCaptureHTML: maxPostsToCapture=${request.maxPostsToCapture}`
+        );
 
         scrollAndCaptureHTML((num) => {
+            chrome.runtime.sendMessage({
+                action: "saveExcelOnBackground",
+                result: `${num} posts has updated`,
+            });
             sendResponse({ num: num });
-            // chrome.runtime.sendMessage(
-            //     {
-            //         action: "asyncJobCompleted",
-            //         result: `${num} posts has updated`,
-            //     },
-            //     (response) => {
-            //         console.log(
-            //             "message received from sendResponse: " +
-            //                 response.message
-            //         );
-            //     }
-            // );
-        }).catch((error) => {
+        }, request.maxPostsToCapture).catch((error) => {
             console.error("Error:", error);
             sendResponse({ error: error });
         });
