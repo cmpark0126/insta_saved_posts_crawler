@@ -44,7 +44,7 @@
 
 ## set maximum number of posts you want to capture and click start
 
-![set](asset/5_1_set.png)
+![set](assets/5_1_set.png)
 
 -   **크롤링 도중에는 크롬 탭을 바꾸지 마세요. 크롤링이 멈출 수 있습니다**
 -   **스크롤 문제나, 인터넷 문제로 아직 max값이 차지 않았는데 크롤링이 끝났다면, 다시 Start 버튼을 누르면 이전에 저장한 것을 유지하고 다음 크롤링을 진행합니다**
