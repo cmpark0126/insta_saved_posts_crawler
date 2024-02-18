@@ -51,6 +51,8 @@
 -   **크롤링 도중에 중간 결과물을 한번 저장하고 싶다면 SaveManually 버튼을 누르면 중간 결과물을 저장합니다.**
 -   **만약 스크롤이 끝났는데 다운로드 창이 뜨지 않는 경우에도 SaveManually 버튼을 눌러주세요. 지금까지 크롤링한 결과물을 저장하실 수 있습니다**
 
+---
+
 ## 6. check downloaded file from extension
 
 ![download](assets/6_1_download.png)
