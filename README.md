@@ -1,6 +1,6 @@
 # insta_saved_post_crawl
 
-<span style="color: red;">이 크롤러는 개인적으로 활용하기 위해서 개발한 것으로 보안상 위협적일 수 있는 구현을 포함합니다. 무단 배포 및 수정을 철저하게 금지합니다. </span>
+**이 크롤러는 개인적으로 활용하기 위해서 개발한 것으로 보안상 위협적일 수 있는 구현을 포함합니다. 무단 배포 및 수정을 철저하게 금지합니다.**
 
 ## download repository as a zip file
 
@@ -46,15 +46,19 @@
 
 ![set](asset/5_1_set.png)
 
-## check downloaded file from extension
-
-![download](assets/6_1_download.png)
+-   **please do nothing until complete crawling**
 
 ---
 
-## check whether blog is updated
+## check downloaded file from extension
 
-![6_1_blog](assets/6_1_blog.png)
+## ![download](assets/6_1_download.png)
+
+---
+
+## drop-down excel file into blog to update database
+
+TODO
 
 ---
 
