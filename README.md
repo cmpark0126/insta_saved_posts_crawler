@@ -59,9 +59,13 @@
 
 ---
 
-## 7. drop-down excel file into blog to update database
+## 7. drop-down excel file into blog to update database (Optional)
 
-TODO
+![upload](assets/7_1_upload.png)
+![db](assets/7_2_db.png)
+
+-   파일을 업로드 하면 자동으로 연결된 백엔드 서버로 post 생성 요청을 보내고, 이를 기반으로 DB가 업데이트 됩니다.
+-   (블로그는 아직 전체 공개되지 않았습니다.)
 
 ---
 
