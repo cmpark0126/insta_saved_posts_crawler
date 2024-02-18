@@ -156,9 +156,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const worksheet = workbook.addWorksheet("My Sheet");
 
             worksheet.columns = [
-                { header: "URL", key: "url" },
-                { header: "Title", key: "title" },
-                { header: "Image", key: "image" },
+                { header: "url", key: "url" },
+                { header: "content", key: "content" },
+                { header: "thumbnail", key: "thumbnail" },
             ];
             worksheet.addRows(ListOfPosts);
 
