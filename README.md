@@ -42,11 +42,9 @@
 
 ---
 
-## copy query url, user, token from blog main page and paste it to extension, and click start
+## set maximum number of posts you want to capture
 
-![5_1_copy](assets/5_1_copy.png)
-
-![5_2_paste](assets/5_2_paste.png)
+![set](asset/5_1_set.png)
 
 <span style="color: red;">크롤링이 진행되는 동안에는 다른 작업을 하면 크롤링이 일시 중지될 수 있습니다.</span>
 
