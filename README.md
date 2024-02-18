@@ -42,11 +42,13 @@
 
 ---
 
-## set maximum number of posts you want to capture
+## set maximum number of posts you want to capture and click start
 
 ![set](asset/5_1_set.png)
 
-<span style="color: red;">크롤링이 진행되는 동안에는 다른 작업을 하면 크롤링이 일시 중지될 수 있습니다.</span>
+## check downloaded file from extension
+
+![download](assets/6_1_download.png)
 
 ---
 
