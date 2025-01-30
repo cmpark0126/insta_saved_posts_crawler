@@ -39,6 +39,8 @@ This project provides functionality to crawl and save Instagram saved posts.
 ![4_1_instagram](assets/4_1_instagram.png)
 
 -   you need to replace <user_id> to your instagram user id
+  -   may you need to login to your instagram account
+-   may you need to reload the page to apply the extension
 
 ---
 
