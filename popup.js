@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("saveButton").addEventListener("click", () => {
         // Query the current active tab
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            // Send a message to the active tab to start scrolling and capturing HTML
+            // Send a message to the active tab to start saving manually
             chrome.tabs.sendMessage(
                 tabs[0].id,
                 {
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             ).textContent = `Error: ${chrome.runtime.lastError.message}`;
                         } else {
                             document.getElementById("numPosts").textContent =
-                                "Error save posts.";
+                                "Error saving posts.";
                         }
                     }
                 }
