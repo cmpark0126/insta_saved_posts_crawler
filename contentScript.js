@@ -5,10 +5,12 @@ let setOfUrls = new Set();
 let ListOfPosts = new Array();
 
 function crawlPostLinks() {
+    // console.log("Starting crawlPostLinks");
+
     let numCaptured = 0;
 
     const postsContainerXPath =
-        "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[2]/section/main/div/div/div[3]/article/div[1]/div";
+        "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[1]/section/main/div/div/div[3]/article/div[1]/div";
     const postsContainer = document
         .evaluate(
             postsContainerXPath,
@@ -18,6 +20,17 @@ function crawlPostLinks() {
             null
         )
         .snapshotItem(0);
+
+    // console.log("postsContainer:", postsContainer);
+
+    // postsContainer가 null인지 확인
+    if (!postsContainer) {
+        console.error("Posts container not found. Please check the XPath.");
+        return numCaptured; // 0을 반환하여 수집된 게시물이 없음을 나타냄
+    }
+
+    // console.log("Posts container found. Proceeding to capture links.");
+
     const postBuckets = document.evaluate(
         "./div",
         postsContainer,
@@ -25,6 +38,9 @@ function crawlPostLinks() {
         XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
         null
     );
+
+    // console.log(`Total post buckets found: ${postBuckets.snapshotLength}`);
+
     for (let i = 0; i < postBuckets.snapshotLength; i++) {
         let postBucket = postBuckets.snapshotItem(i);
         let posts = document.evaluate(
@@ -34,6 +50,8 @@ function crawlPostLinks() {
             XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
             null
         );
+        // console.log(`Posts found in bucket ${i}: ${posts.snapshotLength}`);
+
         for (let j = 0; j < posts.snapshotLength; j++) {
             let post = posts.snapshotItem(j);
             let postLink = document.evaluate(
@@ -71,13 +89,16 @@ function crawlPostLinks() {
                         postInner.src,
                     ]);
 
-                    console.log(`post of ${postLink.href} has captured.`);
+                    // console.log(`Captured post: ${postLink.href}`);
                     numCaptured++;
                 }
+            } else {
+                console.warn("Post link not found.");
             }
         }
     }
 
+    console.log(`Total posts captured in this run: ${numCaptured}`);
     return numCaptured;
 }
 
