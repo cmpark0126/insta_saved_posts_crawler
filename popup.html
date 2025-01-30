@@ -5,7 +5,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Instagram Saved Posts Crawler</title>
         <link rel="stylesheet" href="styles/popup.css" />
-        <!-- CSS 파일 참조 -->
+        <!-- CSS file reference -->
+        <style>
+            input[type="number"] {
+                width: calc(100% - 22px); /* Adjust to the same width as the button */
+                padding: 10px; /* Set internal padding */
+                margin-top: 5px; /* Set top margin */
+                border: 1px solid #ccc; /* Set border */
+                border-radius: 5px; /* Set border radius */
+            }
+        </style>
     </head>
 
     <body>
@@ -13,10 +22,11 @@
         <input
             type="number"
             id="maxPostsToCapture"
-            placeholder="최대로 크롤링할 Post 개수"
+            placeholder="Max Posts to Capture"
+            value="100"
         />
-        <button id="startButton">Start</button>
-        <button id="saveButton">SaveManually</button>
+        <button id="startButton" title="Start crawling posts. This will capture the specified number of posts from your saved Instagram feed. Please ensure you are on the correct tab, as it may not work properly if you switch tabs.">Start Crawl</button>
+        <button id="saveButton" title="Save posts manually. This allows you to save the current progress in case the process is interrupted.">Save Manually</button>
         <div id="numPosts"></div>
         <script src="popup.js"></script>
     </body>

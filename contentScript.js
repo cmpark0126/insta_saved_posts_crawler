@@ -1,8 +1,10 @@
+// Load ExcelJS library
 // const ExcelJS = require("lib/exceljs.min.js");
 
-const TIME = 1000; // 1 second
-let setOfUrls = new Set();
-let ListOfPosts = new Array();
+// Set the crawling interval (1 second)
+const TIME = 1000; 
+let setOfUrls = new Set(); // Set to store collected URLs
+let ListOfPosts = new Array(); // List to store collected posts
 
 function crawlPostLinks() {
     // console.log("Starting crawlPostLinks");
