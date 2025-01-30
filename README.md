@@ -1,4 +1,4 @@
-# insta_saved_post_crawl
+# insta_saved_posts_crawler
 
 This project provides functionality to crawl and save Instagram saved posts.
 
