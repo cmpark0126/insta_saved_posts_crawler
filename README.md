@@ -1,8 +1,8 @@
 # insta_saved_post_crawl
 
-**이 크롤러는 개인적으로 활용하기 위해서 개발한 것으로 보안상 위협적일 수 있는 구현을 포함합니다. 무단 배포 및 수정을 철저하게 금지합니다.**
+This project provides functionality to crawl and save Instagram saved posts.
 
-## 1. download repository as a zip file
+## 1. Download repository as a zip file
 
 ![1_download](assets/1_download.png)
 
@@ -20,7 +20,7 @@
 
 ![3_1_chrome](assets/3_1_chrome.png)
 
-### 3-2. enable 개발자(developer) mode
+### 3-2. enable developer mode
 
 ![3_2_dev](assets/3_2_dev.png)
 
@@ -46,26 +46,10 @@
 
 ![set](assets/5_1_set.png)
 
--   **크롤링 도중에는 크롬 탭을 바꾸지 마세요. 크롤링이 멈출 수 있습니다**
--   **스크롤 문제나, 인터넷 문제로 아직 max값이 차지 않았는데 크롤링이 끝났다면, 다시 Start 버튼을 누르면 이전에 저장한 것을 유지하고 다음 크롤링을 진행합니다**
--   **크롤링 도중에 중간 결과물을 한번 저장하고 싶다면 SaveManually 버튼을 누르면 중간 결과물을 저장합니다.**
--   **만약 스크롤이 끝났는데 다운로드 창이 뜨지 않는 경우에도 SaveManually 버튼을 눌러주세요. 지금까지 크롤링한 결과물을 저장하실 수 있습니다**
-
----
-
-## 6. check downloaded file from extension
-
-![download](assets/6_1_download.png)
-
----
-
-## 7. drop-down excel file into blog to update database (Optional)
-
-![upload](assets/7_1_upload.png)
-![db](assets/7_2_db.png)
-
--   파일을 업로드 하면 자동으로 연결된 백엔드 서버로 post 생성 요청을 보내고, 이를 기반으로 DB가 업데이트 됩니다.
--   (블로그는 아직 전체 공개되지 않았습니다.)
+-   **Do not switch Chrome tabs during crawling. It may cause the crawling to stop.**
+-   **If crawling ends before reaching the max value due to scrolling or internet issues, pressing the Start button again will resume crawling while keeping the previously saved data.**
+-   **If you want to save intermediate results during crawling, press the SaveManually button to save the current results.**
+-   **If the download window does not appear after scrolling is complete, please press the SaveManually button to save the results collected so far.**
 
 ---
 

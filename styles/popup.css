@@ -1,22 +1,20 @@
 body {
-    font-family: Arial, sans-serif;
-    width: 300px;
-    /* 팝업의 너비를 300px로 설정 */
-    margin: 0;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    font-family: Arial, sans-serif; /* Set default font */
+    width: 300px; /* Set popup width */
+    margin: 0; /* Remove default margin */
+    padding: 10px; /* Set internal padding */
+    display: flex; /* Use Flexbox */
+    flex-direction: column; /* Align vertically */
+    align-items: center; /* Center alignment */
 }
 
 #status {
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Set bottom margin */
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    width: 100%;
-    /* 버튼의 너비를 body에 꽉 차게 설정 */
+    padding: 10px 20px; /* Set button internal padding */
+    font-size: 16px; /* Set button font size */
+    cursor: pointer; /* Change cursor shape */
+    width: 100%; /* Set button width to 100% */
 }
