@@ -55,6 +55,15 @@ This project provides functionality to crawl and save Instagram saved posts.
 
 ---
 
+## 6. download posts list as an excel file after crawling is complete
+
+![6_1_download_posts](assets/6_1_download_posts.png)
+![6_2_downloaded_posts](assets/6_2_downloaded_posts.png)
+
+-   after crawling is complete, the posts list will be downloaded as an excel file.
+
+---
+
 ## Known Issues
 
 ### 1. Error: could not establish connection. receiving end does not exist. message

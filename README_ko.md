@@ -55,6 +55,15 @@
 
 ---
 
+## 6. 크롤링 완료 후 포스트 목록을 엑셀 파일로 다운로드하기
+
+![6_1_download_posts](assets/6_1_download_posts.png)
+![6_2_downloaded_posts](assets/6_2_downloaded_posts.png)
+
+-   크롤링이 완료되면 포스트 목록이 엑셀 파일 다운로드 창이 뜹니다.
+
+---
+
 ## 알려진 문제
 
 ### 1. 오류: 연결을 설정할 수 없습니다. 수신 측이 존재하지 않습니다. 메시지
