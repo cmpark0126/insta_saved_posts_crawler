@@ -12,7 +12,7 @@ function crawlPostLinks() {
     let numCaptured = 0;
 
     const postsContainerXPath =
-        "/html/body/div[2]/div/div/div[2]/div/div/div[1]/div[1]/div[1]/section/main/div/div/div[3]/article/div[1]/div";
+        "/html/body/div[1]/div/div/div[2]/div/div/div[1]/div[1]/div[1]/section/main/div/div/div[3]/article/div[1]";
     const postsContainer = document
         .evaluate(
             postsContainerXPath,
@@ -23,7 +23,7 @@ function crawlPostLinks() {
         )
         .snapshotItem(0);
 
-    // console.log("postsContainer:", postsContainer);
+    console.log("postsContainer:", postsContainer);
 
     // postsContainer가 null인지 확인
     if (!postsContainer) {
@@ -31,17 +31,17 @@ function crawlPostLinks() {
         return numCaptured; // 0을 반환하여 수집된 게시물이 없음을 나타냄
     }
 
-    // console.log("Posts container found. Proceeding to capture links.");
+    console.log("Posts container found. Proceeding to capture links.");
 
     const postBuckets = document.evaluate(
-        "./div",
+        "./div/div",
         postsContainer,
         null,
         XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
         null
     );
 
-    // console.log(`Total post buckets found: ${postBuckets.snapshotLength}`);
+    console.log(`Total post buckets found: ${postBuckets.snapshotLength}`);
 
     for (let i = 0; i < postBuckets.snapshotLength; i++) {
         let postBucket = postBuckets.snapshotItem(i);
