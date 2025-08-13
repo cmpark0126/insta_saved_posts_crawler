@@ -87,7 +87,7 @@ function crawlPostLinks() {
 
                     ListOfPosts.push([
                         postLink.href,
-                        postInner.alt,
+                        postInner.alt ? postInner.alt.replace(/\r?\n/g, ' ') : '',
                         postInner.src,
                     ]);
 
@@ -173,34 +173,34 @@ async function scrollAndCaptureHTML(callback, maxPostsToCapture = 1000) {
     });
 }
 
-function saveExcelAndNotify(num) {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("My Sheet");
-
-    worksheet.columns = [
-        { header: "url", key: "url" },
-        { header: "content", key: "content" },
-        { header: "thumbnail", key: "thumbnail" },
-    ];
-    worksheet.addRows(ListOfPosts);
-
-    workbook.xlsx.writeBuffer().then(function (buffer) {
-        const blob = new Blob([buffer], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "posts.xlsx";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+function saveCsvAndNotify(num) {
+    // CSV 헤더
+    let csvContent = "url,content,thumbnail\n";
+    
+    // 데이터 행 추가
+    ListOfPosts.forEach(post => {
+        const [url, content, thumbnail] = post;
+        // CSV 필드에서 쉼표와 따옴표 이스케이프 처리
+        const escapedContent = content ? `"${content.replace(/"/g, '""')}"` : '""';
+        const escapedUrl = `"${url}"`;
+        const escapedThumbnail = `"${thumbnail}"`;
+        csvContent += `${escapedUrl},${escapedContent},${escapedThumbnail}\n`;
     });
+
+    // CSV 파일 다운로드
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "posts.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
     chrome.runtime.sendMessage(
         {
             action: "asyncJobCompleted",
-            result: `${num} posts has crawled and saved into posts.xlsx.`,
+            result: `${num} posts has crawled and saved into posts.csv.`,
         },
         (response) => {
             console.log(
@@ -218,7 +218,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         scrollAndCaptureHTML((num) => {
             sendResponse({ num: num });
-            saveExcelAndNotify(num);
+            saveCsvAndNotify(num);
         }, request.maxPostsToCapture).catch((error) => {
             console.error("Error:", error);
             sendResponse({ error: error });
@@ -236,7 +236,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         let num = ListOfPosts.length;
         sendResponse({ num: num });
-        saveExcelAndNotify(num);
+        saveCsvAndNotify(num);
 
         console.log("Scrolling and capturing started.");
 
